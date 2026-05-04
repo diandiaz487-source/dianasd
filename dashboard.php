@@ -8,94 +8,230 @@ if (!isset($_SESSION['id'])) {
 }
 ?>
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
-    <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="./wwwroot/css/bootstrap-icons.min.css">
-    <script src="./wwwroot/js/jquery-4.0.0.min.js"></script>
-    <script src="./wwwroot/js/script.js"></script>
-  </head>
-  <body>
-    <header>
-      <div class="px-3 py-2 text-bg-primary border-bottom">
-        <div class="container">
-          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none"> 
-              <i class="bi bi-bootstrap fw-bold fs-5 pe-2"></i>
-            </a>
-            <nav >
-            <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-              <li><a class="nav-link text-white" href="#"> <i class="bi bi-house fw-bold fs-5 pe-2"></i>Home</a></li>
-              <li><a class="nav-link text-white" href="logout.php"> 
-                  <i class="bi bi-box-arrow-in-left fw-bold fs-5 pe-2"></i>Salir
-                </a></li>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteca Virtual</title>
 
-            </ul>
-            </nav>
-          </div>
+  <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./wwwroot/css/bootstrap-icons.min.css">
+  <script src="./wwwroot/js/jquery-4.0.0.min.js"></script>
 
-        </div>
-      </div>
-    </header>
-    <div class="container-fluid">
+  <style>
+    body {
+      background-color: #f4f6f9;
+    }
 
-      <div class="row">
+    .sidebar {
+      position: fixed;
+      top: 70px;
+      bottom: 0;
+      left: 0;
+      width: 250px;
+      padding: 15px;
+      background: #ffffff;
+      border-right: 1px solid #ddd;
+    }
 
-        <aside class="col-8 col-sm-6 col-md-3 col-lg-3 col-xl-2 d-none d-lg-block show"
-        style="position: fixed; top: 0;bottom: 0;left: 0;border-right: 1px solid var(--bs-border-color-translucent); margin-top:70px; padding: 15px 0 0;z-index: 999; overflow-y: auto;">
-        <div class="px-3">
-          <nav>
-          <ul class="nav nav-pills flex-column mb-auto">            
-            <li class="nav-item">
-              <a class="nav-link active" href="#" onclick="document.getElementById('lightbulb').src='./wwwroot/img/bulboff.gif'">
-              <i class="bi bi-lightbulb fw-bold fs-5 pe-2"></i>
-              Apagado</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link"  href="#" onclick="document.getElementById('lightbulb').src='./wwwroot/img/bulbon.gif'">
-              <i class="bi bi-lightbulb-fill fw-bold fs-5 pe-2"></i>
-              Encendido</a>
-            </li>
-          </ul>
-        </nav>
-        </div>
-        
-      </aside>
+    .sidebar .nav-link {
+      color: #333;
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
 
-      <main class="col-lg-9 col-xl-10 offset-lg-3 offset-xl-2">
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      background-color: #0d6efd;
+      color: white;
+    }
 
-        <div class="row">
-          <div class="col-12 offset-sm-0 offset-lg-1 col-lg-10 offset-xl-2 col-xl-8 mt-5">
-            <article id="article">
-            <figure>
-              <img id="lightbulb" class="img-fluid" src="./wwwroot/img/bulboff.gif">
-            </figure>
-          </article>
+    .content {
+      margin-left: 260px;
+      padding: 20px;
+    }
 
-          </div>
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
 
-        </div>
-          
-      </main>
+    .table {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+  </style>
+</head>
 
-      </div>
-      
-      <div class="row">
-        
-      </div>
-      
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="px-3 py-2 text-bg-primary border-bottom">
+    <div class="container-fluid d-flex justify-content-between">
+      <span class="fw-bold fs-5">
+        <i class="bi bi-book"></i> Biblioteca Virtual
+      </span>
+
+      <a class="text-white text-decoration-none" href="logout.php">
+        <i class="bi bi-box-arrow-right"></i> Salir
+      </a>
     </div>
-    
-    
-    
+  </div>
+</header>
 
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <ul class="nav flex-column">
 
-    <script src="./js/bootstrap.bundle.min.js"></script>
-  </body>
+    <li>
+      <a class="nav-link active" href="#" onclick="showSection('dashboard')">
+        <i class="bi bi-speedometer2"></i> Dashboard
+      </a>
+    </li>
+
+    <li>
+      <a class="nav-link" href="#" onclick="showSection('autores')">
+        <i class="bi bi-person"></i> Autores
+      </a>
+    </li>
+
+    <li>
+      <a class="nav-link" href="#" onclick="showSection('libros')">
+        <i class="bi bi-book"></i> Libros
+      </a>
+    </li>
+
+    <li>
+      <a class="nav-link" href="#" onclick="showSection('prestamos')">
+        <i class="bi bi-journal-check"></i> Préstamos
+      </a>
+    </li>
+
+  </ul>
+</div>
+
+<!-- CONTENIDO -->
+<div class="content">
+
+  <!-- DASHBOARD -->
+  <div id="dashboard">
+    <div class="row g-4">
+
+      <div class="col-md-4">
+        <div class="card p-3">
+          <h6>Total Libros</h6>
+          <h3>120</h3>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card p-3">
+          <h6>Autores</h6>
+          <h3>45</h3>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card p-3">
+          <h6>Préstamos Activos</h6>
+          <h3>18</h3>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- AUTORES -->
+  <div id="autores" style="display:none;">
+    <h4 class="mb-3">Autores</h4>
+
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Nacionalidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Gabriel García Márquez</td>
+          <td>Colombia</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- LIBROS -->
+  <div id="libros" style="display:none;">
+    <h4 class="mb-3">Libros</h4>
+
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Autor</th>
+          <th>Año</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Cien años de soledad</td>
+          <td>García Márquez</td>
+          <td>1967</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PRESTAMOS -->
+  <div id="prestamos" style="display:none;">
+    <h4 class="mb-3">Préstamos</h4>
+
+    <table class="table table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Libro</th>
+          <th>Usuario</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>Cien años de soledad</td>
+          <td>Diana</td>
+          <td>2026-04-30</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- SCRIPT -->
+<script>
+  function showSection(section) {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('autores').style.display = 'none';
+    document.getElementById('libros').style.display = 'none';
+    document.getElementById('prestamos').style.display = 'none';
+
+    document.getElementById(section).style.display = 'block';
+  }
+</script>
+
+<script src="./wwwroot/js/bootstrap.bundle.min.js"></script>
+
+</body>
 </html>
-
+     
 
 
