@@ -1,7 +1,12 @@
 <?php
 session_start();
 
-// ¿Existe la sesión? Si no, fuera de aquí.
+// 🔥 Si no hay sesión pero sí cookie → recuperar sesión
+if (!isset($_SESSION['id']) && isset($_COOKIE['id_usuario'])) {
+    $_SESSION['id'] = $_COOKIE['id_usuario'];
+}
+
+// 🔒 Si no hay nada → fuera
 if (!isset($_SESSION['id'])) {
     header("Location: index.html");
     exit();
@@ -73,6 +78,11 @@ if (!isset($_SESSION['id'])) {
     <div class="container-fluid d-flex justify-content-between">
       <span class="fw-bold fs-5">
         <i class="bi bi-book"></i> Biblioteca Virtual
+      </span>
+
+      <!-- 👇 EXTRA: mostrar usuario -->
+      <span class="text-white">
+        Bienvenido: <?php echo $_SESSION['username'] ?? 'Usuario'; ?>
       </span>
 
       <a class="text-white text-decoration-none" href="logout.php">
@@ -232,6 +242,3 @@ if (!isset($_SESSION['id'])) {
 
 </body>
 </html>
-     
-
-
