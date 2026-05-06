@@ -1,66 +1,49 @@
 <?php
 
-// index.php
-require_once 'db.php'; // Traemos el código del otro archivo
+require_once 'db.php';
 
+$email  = $_POST['email'];
+$pwd = $_POST['pwd'];
 
+$db = conectarDB();
 
-//  Obtenemos los datos del formulario
-     $email  = $_POST['email'];
-     $pwd = $_POST['pwd'];
-     
-     // Llamamos a la función y guardamos el objeto en $db
-     $db = conectarDB();
-      
+try {
 
-  try {
-  
+    $sql = "select id_usuario,password,email from usuarios where email= :email";
+    $query = $db->prepare($sql);
 
+    $query->execute([
+        'email'  => $email
+    ]);
 
-        $sql = "select id_usuario,password,email from usuarios where email= :email";
-        $query = $db->prepare($sql);
+    $usuario = $query->fetch(PDO::FETCH_ASSOC);
 
-	
+    if($usuario){
 
-        // Ejecutamos pasando los datos en un array
-        $resultado = $query->execute([
-            'email'  => $email
-        ]);
-        $usuario = $query->fetch(PDO::FETCH_ASSOC);
-        if($usuario){
         $verify = password_verify($pwd, $usuario['password']);
+
         if($verify){
             session_start();
-            $_SESSION['username'] = $usuario['email']; // Store session data
+
+            $_SESSION['username'] = $usuario['email'];
             $_SESSION['id'] = $usuario['id_usuario'];
+
+            // 🔥 COOKIE
+            setcookie("id_usuario", $usuario['id_usuario'], time() + (86400 * 30), "/");
+
             header("Location: dashboard.php");
-            
+            exit();
+
         }else{
             echo "La contraseña esta mal...";
         }
-        
-        
-        }else{
-            echo "No se encontraron datos!";
-        }
 
-        
-
-        
-
-        
-
-    } catch (PDOException $e) {
-        // Manejo de errores (ej. si el email ya existe y es único)
-        echo "Database Error: " . $e->getMessage();
-
-        
-     
+    }else{
+        echo "No se encontraron datos!";
     }
 
-
-
-
-
+} catch (PDOException $e) {
+    echo "Database Error: " . $e->getMessage();
+}
 
 ?>
