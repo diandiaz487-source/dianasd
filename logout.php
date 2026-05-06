@@ -1,7 +1,16 @@
 <?php
 session_start();
-session_unset();    // Elimina las variables
-session_destroy();  // Destruye la sesión
+
+// eliminar variables de sesión
+session_unset();
+
+// destruir la sesión
+session_destroy();
+
+// eliminar la cookie
+setcookie("id_usuario", "", time() - 3600, "/");
+
+// redirigir al login
 header("Location: index.html");
 exit();
 ?>
