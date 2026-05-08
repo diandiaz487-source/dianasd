@@ -1,157 +1,57 @@
-<!doctype html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login - Biblioteca</title>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registro</title>
+    <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./wwwroot/css/style.css" rel="stylesheet">
+  </head>
+  <body>
+    <main id="main">
+      <div class="container-lg d-flex flex-column">
+        <div class="row align-items-center justify-content-center no-gutters">
+          <div class="col-md-7 col-lg-5">
+            <div class="shadow mt-5 p-5 bg-white rounded-3 border">
+            <div class="w-100 text-center">
+              <h1 class="display-6">Regístrate</h1>
+            </div>
+            
+            <!-- AQUÍ ESTÁ EL CAMBIO: Agregué el FORM -->
+            <form action="usuarios.php" method="POST">
+              <div class="col-12">
+                <div class="mb-3">
+                  <label for="nombre" class="form-label">Nombre Completo</label>
+                  <!-- Agregué name="nombre" -->
+                  <input name="nombre" class="form-control" id="nombre" required="">
+                </div>
 
-  <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="./wwwroot/css/bootstrap-icons.min.css">
-
-  <style>
-    body {
-      background: linear-gradient(135deg, #ff4d88, #ff99bb);
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Segoe UI', sans-serif;
-    }
-
-    .login-card {
-      background: white;
-      border-radius: 20px;
-      padding: 40px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      animation: fadeIn 0.6s ease;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .login-title {
-      color: #d63384;
-      font-weight: bold;
-    }
-
-    .form-control {
-      border-radius: 10px;
-      padding: 10px;
-    }
-
-    .form-control:focus {
-      border-color: #ff4d88;
-      box-shadow: 0 0 0 0.2rem rgba(255,77,136,0.25);
-    }
-
-    .btn-login {
-      background: #ff4d88;
-      color: white;
-      border-radius: 10px;
-      width: 100%;
-      transition: 0.3s;
-      border: none;
-      padding: 10px;
-    }
-
-    .btn-login:hover {
-      background: #e6005c;
-      color: white;
-    }
-
-    .extra-links a {
-      color: #ff4d88;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .extra-links a:hover {
-      text-decoration: underline;
-    }
-
-    .icon-circle {
-      width: 70px;
-      height: 70px;
-      background: #ffe0eb;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: auto;
-      margin-bottom: 15px;
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="login-card">
-
-    <div class="text-center">
-      <div class="icon-circle">
-        <i class="bi bi-book fs-3 text-danger"></i>
+                <div class="mb-3">
+                  <label for="email" class="form-label">Email</label>
+                  <!-- Agregué name="email" -->
+                  <input name="email" type="email" class="form-control" id="email" required="">
+                </div>
+                
+                <div class="mb-3">
+                  <label for="pwd" class="form-label">Contraseña</label>
+                  <!-- Agregué name="pwd" -->
+                  <input name="pwd" class="form-control" type="password" id="pwd" required="">
+                </div>
+                
+                <div class="d-flex justify-content-between py-3">
+                  <div>
+                    <span class="small text-muted">¿Ya tienes cuenta?</span>
+                    <a class="small" href="index.html">Iniciar sesión</a>
+                    <button class="btn btn-outline-primary" onclick="registroUsuarios();"> Registrarse</button>
+                  </div>
+                  <!-- QUITÉ onclick y puse type="submit" -->
+                 <button class="btn btn-outline-primary" onclick="login();"> Iniciar sesión</button>
+                </div>
+              </div>
+            </form>
+            
+            </div>
+          </div>
+        </div>
       </div>
-
-      <h3 class="login-title">Biblioteca Virtual</h3>
-      <p class="text-muted">Inicia sesión para continuar</p>
-    </div>
-
-    <!-- FORMULARIO LOGIN -->
-    <form action="login.php" method="POST" class="mt-4">
-
-      <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-
-        <input
-          name="email"
-          type="email"
-          class="form-control"
-          id="email"
-          placeholder="ejemplo@email.com"
-          required
-        >
-      </div>
-
-      <div class="mb-3">
-        <label for="pwd" class="form-label">Contraseña</label>
-
-        <input
-          name="pwd"
-          type="password"
-          class="form-control"
-          id="pwd"
-          placeholder="********"
-          required
-        >
-      </div>
-
-      <button type="submit" class="btn btn-login mt-2">
-        <i class="bi bi-box-arrow-in-right"></i>
-        Iniciar sesión
-      </button>
-
-      <div class="d-flex justify-content-between mt-3 extra-links">
-        <span class="small text-muted">¿No tienes cuenta?</span>
-
-        <a href="registro.html">Crear cuenta</a>
-      </div>
-
-    </form>
-
-  </div>
-
-  <script src="./wwwroot/js/bootstrap.bundle.min.js"></script>
-
-</body>
-</html>
+    </main>
+  
+</body></html>

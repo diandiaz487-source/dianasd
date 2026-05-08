@@ -1,93 +1,56 @@
 <?php
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 session_start();
-
-require_once 'db.php';
+include("db.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    // Obtener datos del formulario
-    $email = trim($_POST['email']);
-    $pwd   = trim($_POST['pwd']);
+    $correo = $_POST['correo'];
+    $password = $_POST['password'];
 
-    // Conexión a BD
-    $db = conectarDB();
+    $sql = "SELECT * FROM usuarios 
+            WHERE correo='$correo' 
+            AND password='$password'";
 
-    try {
+    $resultado = mysqli_query($conn, $sql);
 
-        // Buscar usuario por email
-        $sql = "SELECT * FROM usuarios WHERE email = :email LIMIT 1";
+    if (mysqli_num_rows($resultado) > 0) {
 
-        $query = $db->prepare($sql);
+        $usuario = mysqli_fetch_assoc($resultado);
 
-        $query->execute([
-            ':email' => $email
-        ]);
+        $_SESSION['usuario'] = $usuario['nombre'];
 
-        // Obtener usuario
-        $usuario = $query->fetch();
+        header("Location: dashboard.php");
+        exit();
 
-        // Verificar si existe usuario
-        if ($usuario) {
-
-            // Verificar contraseña
-            if (password_verify($pwd, $usuario['password'])) {
-
-                // Crear sesión
-                $_SESSION['id'] = $usuario['id_usuario'];
-                $_SESSION['username'] = $usuario['nombre'];
-                $_SESSION['email'] = $usuario['email'];
-                $_SESSION['login_time'] = time();
-
-                // Redireccionar al dashboard
-                header("Location: dashboard.php");
-                exit();
-
-            } else {
-
-                echo "
-                <h3 style='color:red; text-align:center; margin-top:40px;'>
-                    Contraseña incorrecta
-                </h3>
-
-                <div style='text-align:center; margin-top:20px;'>
-                    <a href='index.html'>Volver al login</a>
-                </div>
-                ";
-            }
-
-        } else {
-
-            echo "
-            <h3 style='color:red; text-align:center; margin-top:40px;'>
-                Usuario no encontrado
-            </h3>
-
-            <div style='text-align:center; margin-top:20px;'>
-                <a href='index.html'>Volver al login</a>
-            </div>
-            ";
-        }
-
-    } catch (PDOException $e) {
-
-        echo "
-        <h3 style='color:red; text-align:center; margin-top:40px;'>
-            Error de Base de Datos
-        </h3>
-
-        <pre>";
-        print_r($e->getMessage());
-        echo "</pre>";
+    } else {
+        echo "Correo o contraseña incorrectos";
     }
-
-} else {
-
-    // Si alguien entra directo al archivo
-    header("Location: index.html");
-    exit();
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+</head>
+<body>
+
+<h2>Iniciar Sesión</h2>
+
+<form method="POST">
+
+    <input type="email" name="correo" placeholder="Correo" required>
+
+    <br><br>
+
+    <input type="password" name="password" placeholder="Contraseña" required>
+
+    <br><br>
+
+    <button type="submit">Entrar</button>
+
+</form>
+
+</body>
+</html>
