@@ -1,4 +1,7 @@
 <?php
+echo "PRUEBA DASHBOARD";
+?>
+<?php
 session_start();
 
 if(!isset($_SESSION['usuario'])){
