@@ -1,489 +1,172 @@
-dashboard.php
-
+<?php
+echo "PRUEBA DASHBOARD";
+?>
 <?php
 session_start();
 
-if (!isset($_SESSION['id'])) {
-    header("Location: index.html");
+if(!isset($_SESSION['usuario'])){
+    header("Location: login.php");
     exit();
 }
 
-require_once 'db.php';
-
-$db = conectarDB();
-
-// INSERTAR AUTOR
-if (isset($_POST['guardar_autor'])) {
-
-    $nombre = $_POST['nombre_autor'];
-    $nacionalidad = $_POST['nacionalidad'];
-    $fecha = $_POST['fecha_nacimiento'];
-
-    $sql = "INSERT INTO autores (nombre, nacionalidad, fecha_nacimiento)
-            VALUES (:nombre, :nacionalidad, :fecha)";
-
-    $query = $db->prepare($sql);
-
-    $query->execute([
-        ':nombre' => $nombre,
-        ':nacionalidad' => $nacionalidad,
-        ':fecha' => $fecha
-    ]);
-
-    header("Location: dashboard.php");
-    exit();
-}
-
-// INSERTAR LIBRO
-if (isset($_POST['guardar_libro'])) {
-
-    $titulo = $_POST['titulo'];
-    $isbn = $_POST['isbn'];
-    $categoria = $_POST['categoria'];
-    $anio = $_POST['anio_publicacion'];
-    $stock = $_POST['stock'];
-    $id_autor = $_POST['id_autor'];
-
-    $sql = "INSERT INTO libros
-            (titulo, isbn, categoria, anio_publicacion, stock, id_autor)
-            VALUES
-            (:titulo, :isbn, :categoria, :anio, :stock, :id_autor)";
-
-    $query = $db->prepare($sql);
-
-    $query->execute([
-        ':titulo' => $titulo,
-        ':isbn' => $isbn,
-        ':categoria' => $categoria,
-        ':anio' => $anio,
-        ':stock' => $stock,
-        ':id_autor' => $id_autor
-    ]);
-
-    header("Location: dashboard.php");
-    exit();
-}
-
-// INSERTAR PRESTAMO
-if (isset($_POST['guardar_prestamo'])) {
-
-    $id_usuario = $_POST['id_usuario'];
-    $id_libro = $_POST['id_libro'];
-    $fecha_prestamo = $_POST['fecha_prestamo'];
-    $fecha_devolucion = $_POST['fecha_devolucion'];
-
-    $sql = "INSERT INTO prestamos
-            (id_usuario, id_libro, fecha_prestamo, fecha_devolucion)
-            VALUES
-            (:id_usuario, :id_libro, :fecha_prestamo, :fecha_devolucion)";
-
-    $query = $db->prepare($sql);
-
-    $query->execute([
-        ':id_usuario' => $id_usuario,
-        ':id_libro' => $id_libro,
-        ':fecha_prestamo' => $fecha_prestamo,
-        ':fecha_devolucion' => $fecha_devolucion
-    ]);
-
-    header("Location: dashboard.php");
-    exit();
-}
-
-// AUTORES
-$autores = $db->query("SELECT * FROM autores ORDER BY id_autor DESC");
-
-// LIBROS
-$libros = $db->query("SELECT
-    libros.*,
-    autores.nombre AS autor_nombre
-FROM libros
-INNER JOIN autores
-ON libros.id_autor = autores.id_autor
-ORDER BY libros.id_libro DESC");
-
-// PRESTAMOS
-$prestamos = $db->query("SELECT
-    prestamos.*,
-    usuarios.nombre AS usuario_nombre,
-    libros.titulo AS libro_nombre
-FROM prestamos
-INNER JOIN usuarios
-ON prestamos.id_usuario = usuarios.id_usuario
-INNER JOIN libros
-ON prestamos.id_libro = libros.id_libro
-ORDER BY prestamos.id_prestamo DESC");
+include("db.php");
 ?>
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Biblioteca Virtual</title>
+<meta charset="UTF-8">
+<title>Biblioteca Virtual</title>
 
-  <link href="./wwwroot/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="./wwwroot/css/bootstrap-icons.min.css">
+<style>
 
-  <style>
-    body {
-      background: #fff0f5;
-      font-family: 'Segoe UI', sans-serif;
-    }
+body{
+    margin:0;
+    font-family:Arial;
+    background:#f5e9ee;
+}
 
-    header {
-      background: linear-gradient(90deg, #ff4d88, #ff80ab);
-      color: white;
-    }
+.sidebar{
+    width:220px;
+    height:100vh;
+    background:white;
+    position:fixed;
+    padding-top:20px;
+}
 
-    .sidebar {
-      position: fixed;
-      top: 70px;
-      bottom: 0;
-      width: 250px;
-      background: white;
-      border-right: 1px solid #f1c6d6;
-      padding: 15px;
-    }
+.sidebar a{
+    display:block;
+    padding:15px;
+    text-decoration:none;
+    color:#333;
+    font-size:20px;
+}
 
-    .sidebar .nav-link {
-      color: #555;
-      border-radius: 10px;
-      margin-bottom: 8px;
-      transition: 0.3s;
-    }
+.sidebar a:hover{
+    background:#f06292;
+    color:white;
+}
 
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-      background: #ff4d88;
-      color: white;
-    }
+.topbar{
+    margin-left:220px;
+    background:#f06292;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+}
 
-    .content {
-      margin-left: 260px;
-      padding: 25px;
-    }
+.content{
+    margin-left:220px;
+    padding:30px;
+}
 
-    .card {
-      border: none;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(255, 77, 136, 0.15);
-    }
+form{
+    background:white;
+    padding:20px;
+    border-radius:15px;
+}
 
-    .table thead {
-      background: #ff80ab;
-      color: white;
-    }
-  </style>
+input{
+    width:30%;
+    padding:12px;
+    margin-right:10px;
+}
+
+button{
+    background:#e53935;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+table{
+    width:100%;
+    background:white;
+    margin-top:20px;
+    border-collapse:collapse;
+}
+
+table th,
+table td{
+    padding:15px;
+    border-bottom:1px solid #ddd;
+}
+
+</style>
+
 </head>
-
 <body>
 
-<header class="px-3 py-3 d-flex justify-content-between align-items-center">
-  <h5 class="m-0">
-    <i class="bi bi-book-half"></i> Biblioteca Virtual
-  </h5>
-
-  <div>
-    Bienvenido: <?php echo $_SESSION['username']; ?>
-  </div>
-
-  <a class="text-white text-decoration-none" href="logout.php">
-    <i class="bi bi-box-arrow-right"></i> Salir
-  </a>
-</header>
-
 <div class="sidebar">
-  <ul class="nav flex-column">
 
-    <li>
-      <a class="nav-link active" href="#" onclick="showSection('dashboard')">
-        Dashboard
-      </a>
-    </li>
+<h2 style="padding-left:15px;">Dashboard</h2>
 
-    <li>
-      <a class="nav-link" href="#" onclick="showSection('autores')">
-        Autores
-      </a>
-    </li>
+<a href="dashboard.php">Autores</a>
+<a href="libros.php">Libros</a>
+<a href="prestamos.php">Préstamos</a>
 
-    <li>
-      <a class="nav-link" href="#" onclick="showSection('libros')">
-        Libros
-      </a>
-    </li>
+</div>
 
-    <li>
-      <a class="nav-link" href="#" onclick="showSection('prestamos')">
-        Préstamos
-      </a>
-    </li>
+<div class="topbar">
 
-  </ul>
+<div>
+Bienvenido: <?php echo $_SESSION['usuario']; ?>
+</div>
+
+<div>
+<a href="logout.php" style="color:white;text-decoration:none;">
+Salir
+</a>
+</div>
+
 </div>
 
 <div class="content">
 
-  <!-- DASHBOARD -->
-  <div id="dashboard">
+<h1>Autores</h1>
 
-    <div class="row g-4">
+<form method="POST" action="autores.php">
 
-      <div class="col-md-4">
-        <div class="card p-4 text-center">
-          <h5>Total Autores</h5>
-          <h2><?php echo $autores->rowCount(); ?></h2>
-        </div>
-      </div>
+<input type="text" name="nombre" placeholder="Nombre" required>
 
-      <div class="col-md-4">
-        <div class="card p-4 text-center">
-          <h5>Total Libros</h5>
-          <h2><?php echo $libros->rowCount(); ?></h2>
-        </div>
-      </div>
+<input type="text" name="nacionalidad" placeholder="Nacionalidad" required>
 
-      <div class="col-md-4">
-        <div class="card p-4 text-center">
-          <h5>Préstamos</h5>
-          <h2><?php echo $prestamos->rowCount(); ?></h2>
-        </div>
-      </div>
+<button type="submit">
+Guardar Autor
+</button>
 
-    </div>
-  </div>
+</form>
 
-  <!-- AUTORES -->
-  <div id="autores" style="display:none;">
+<table>
 
-    <div class="d-flex justify-content-between mb-3">
-      <h3>Autores</h3>
-    </div>
+<tr>
+<th>ID</th>
+<th>Nombre</th>
+<th>Nacionalidad</th>
+</tr>
 
-    <form method="POST" class="card p-4 mb-4 bg-white">
+<?php
 
-      <div class="row g-3">
+$sql = "SELECT * FROM autores";
+$resultado = mysqli_query($conn, $sql);
 
-        <div class="col-md-4">
-          <input type="text" name="nombre_autor" class="form-control" placeholder="Nombre" required>
-        </div>
+while($fila = mysqli_fetch_assoc($resultado)){
 
-        <div class="col-md-4">
-          <input type="text" name="nacionalidad" class="form-control" placeholder="Nacionalidad" required>
-        </div>
+echo "<tr>";
+echo "<td>".$fila['id']."</td>";
+echo "<td>".$fila['nombre']."</td>";
+echo "<td>".$fila['nacionalidad']."</td>";
+echo "</tr>";
 
-        <div class="col-md-4">
-          <input type="date" name="fecha_nacimiento" class="form-control" required>
-        </div>
+}
+?>
 
-        <div class="col-12">
-          <button type="submit" name="guardar_autor" class="btn btn-danger">
-            Guardar Autor
-          </button>
-        </div>
-
-      </div>
-
-    </form>
-
-    <table class="table table-hover bg-white">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre</th>
-          <th>Nacionalidad</th>
-          <th>Fecha Nacimiento</th>
-        </tr>
-      </thead>
-
-      <tbody>
-
-        <?php foreach($autores as $autor): ?>
-
-        <tr>
-          <td><?php echo $autor['id_autor']; ?></td>
-          <td><?php echo $autor['nombre']; ?></td>
-          <td><?php echo $autor['nacionalidad']; ?></td>
-          <td><?php echo $autor['fecha_nacimiento']; ?></td>
-        </tr>
-
-        <?php endforeach; ?>
-
-      </tbody>
-    </table>
-  </div>
-
-  <!-- LIBROS -->
-  <div id="libros" style="display:none;">
-
-    <div class="d-flex justify-content-between mb-3">
-      <h3>Libros</h3>
-    </div>
-
-    <form method="POST" class="card p-4 mb-4 bg-white">
-
-      <div class="row g-3">
-
-        <div class="col-md-4">
-          <input type="text" name="titulo" class="form-control" placeholder="Título" required>
-        </div>
-
-        <div class="col-md-4">
-          <input type="text" name="isbn" class="form-control" placeholder="ISBN" required>
-        </div>
-
-        <div class="col-md-4">
-          <input type="text" name="categoria" class="form-control" placeholder="Categoría" required>
-        </div>
-
-        <div class="col-md-3">
-          <input type="number" name="anio_publicacion" class="form-control" placeholder="Año" required>
-        </div>
-
-        <div class="col-md-3">
-          <input type="number" name="stock" class="form-control" placeholder="Stock" required>
-        </div>
-
-        <div class="col-md-3">
-          <input type="number" name="id_autor" class="form-control" placeholder="ID Autor" required>
-        </div>
-
-        <div class="col-12">
-          <button type="submit" name="guardar_libro" class="btn btn-danger">
-            Guardar Libro
-          </button>
-        </div>
-
-      </div>
-
-    </form>
-
-    <table class="table table-hover bg-white">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Título</th>
-          <th>ISBN</th>
-          <th>Categoría</th>
-          <th>Año</th>
-          <th>Stock</th>
-          <th>Autor</th>
-        </tr>
-      </thead>
-
-      <tbody>
-
-        <?php foreach($libros as $libro): ?>
-
-        <tr>
-          <td><?php echo $libro['id_libro']; ?></td>
-          <td><?php echo $libro['titulo']; ?></td>
-          <td><?php echo $libro['isbn']; ?></td>
-          <td><?php echo $libro['categoria']; ?></td>
-          <td><?php echo $libro['anio_publicacion']; ?></td>
-          <td><?php echo $libro['stock']; ?></td>
-          <td><?php echo $libro['autor_nombre']; ?></td>
-        </tr>
-
-        <?php endforeach; ?>
-
-      </tbody>
-    </table>
-  </div>
-
-  <!-- PRESTAMOS -->
-  <div id="prestamos" style="display:none;">
-
-    <div class="d-flex justify-content-between mb-3">
-      <h3>Préstamos</h3>
-    </div>
-
-    <form method="POST" class="card p-4 mb-4 bg-white">
-
-      <div class="row g-3">
-
-        <div class="col-md-3">
-          <input type="number" name="id_usuario" class="form-control" placeholder="ID Usuario" required>
-        </div>
-
-        <div class="col-md-3">
-          <input type="number" name="id_libro" class="form-control" placeholder="ID Libro" required>
-        </div>
-
-        <div class="col-md-3">
-          <input type="date" name="fecha_prestamo" class="form-control" required>
-        </div>
-
-        <div class="col-md-3">
-          <input type="date" name="fecha_devolucion" class="form-control">
-        </div>
-
-        <div class="col-12">
-          <button type="submit" name="guardar_prestamo" class="btn btn-danger">
-            Guardar Préstamo
-          </button>
-        </div>
-
-      </div>
-
-    </form>
-
-    <table class="table table-hover bg-white">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Usuario</th>
-          <th>Libro</th>
-          <th>Fecha Préstamo</th>
-          <th>Fecha Devolución</th>
-          <th>Estado</th>
-        </tr>
-      </thead>
-
-      <tbody>
-
-        <?php foreach($prestamos as $prestamo): ?>
-
-        <tr>
-          <td><?php echo $prestamo['id_prestamo']; ?></td>
-          <td><?php echo $prestamo['usuario_nombre']; ?></td>
-          <td><?php echo $prestamo['libro_nombre']; ?></td>
-          <td><?php echo $prestamo['fecha_prestamo']; ?></td>
-          <td><?php echo $prestamo['fecha_devolucion']; ?></td>
-          <td><?php echo $prestamo['estado']; ?></td>
-        </tr>
-
-        <?php endforeach; ?>
-
-      </tbody>
-    </table>
-  </div>
+</table>
 
 </div>
 
-<script>
-  function showSection(section) {
-
-    document.getElementById('dashboard').style.display = 'none';
-    document.getElementById('autores').style.display = 'none';
-    document.getElementById('libros').style.display = 'none';
-    document.getElementById('prestamos').style.display = 'none';
-
-    document.getElementById(section).style.display = 'block';
-  }
-</script>
-
-<script src="./wwwroot/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
-
-logout.php
-
-<?php
-session_start();
-session_destroy();
-header("Location: index.html");
-exit();
-?>
