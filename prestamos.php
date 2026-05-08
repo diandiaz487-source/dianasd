@@ -1,33 +1,20 @@
 <?php
 
-require_once 'db.php';
+include("db.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-    $id_usuario = $_POST['id_usuario'];
-    $id_libro = $_POST['id_libro'];
-    $fecha_prestamo = $_POST['fecha_prestamo'];
-    $fecha_devolucion = $_POST['fecha_devolucion'];
+$libro = $_POST['libro'];
+$usuario = $_POST['usuario'];
+$fecha = $_POST['fecha'];
 
-    $db = conectarDB();
+$sql = "INSERT INTO prestamos(libro,usuario,fecha)
+VALUES('$libro','$usuario','$fecha')";
 
-    $sql = "INSERT INTO prestamos
-            (id_usuario, id_libro, fecha_prestamo, fecha_devolucion)
-            VALUES
-            (:id_usuario, :id_libro, :fecha_prestamo, :fecha_devolucion)";
+mysqli_query($conn,$sql);
 
-    $query = $db->prepare($sql);
+header("Location: dashboard.php");
+exit();
 
-    $resultado = $query->execute([
-        ':id_usuario' => $id_usuario,
-        ':id_libro' => $id_libro,
-        ':fecha_prestamo' => $fecha_prestamo,
-        ':fecha_devolucion' => $fecha_devolucion
-    ]);
-
-    if ($resultado) {
-        header("Location: dashboard.php");
-        exit();
-    }
 }
 ?>

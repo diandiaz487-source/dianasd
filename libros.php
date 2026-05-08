@@ -1,37 +1,20 @@
 <?php
 
-require_once 'db.php';
+include("db.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if($_SERVER["REQUEST_METHOD"] == "POST"){
 
-    $titulo = $_POST['titulo'];
-    $isbn = $_POST['isbn'];
-    $categoria = $_POST['categoria'];
-    $anio = $_POST['anio_publicacion'];
-    $stock = $_POST['stock'];
-    $id_autor = $_POST['id_autor'];
+$titulo = $_POST['titulo'];
+$autor = $_POST['autor'];
+$anio = $_POST['anio'];
 
-    $db = conectarDB();
+$sql = "INSERT INTO libros(titulo,autor,anio)
+VALUES('$titulo','$autor','$anio')";
 
-    $sql = "INSERT INTO libros
-            (titulo, isbn, categoria, anio_publicacion, stock, id_autor)
-            VALUES
-            (:titulo, :isbn, :categoria, :anio, :stock, :id_autor)";
+mysqli_query($conn,$sql);
 
-    $query = $db->prepare($sql);
+header("Location: dashboard.php");
+exit();
 
-    $resultado = $query->execute([
-        ':titulo' => $titulo,
-        ':isbn' => $isbn,
-        ':categoria' => $categoria,
-        ':anio' => $anio,
-        ':stock' => $stock,
-        ':id_autor' => $id_autor
-    ]);
-
-    if ($resultado) {
-        header("Location: dashboard.php");
-        exit();
-    }
 }
 ?>
